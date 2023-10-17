@@ -1,5 +1,16 @@
 version: '3'
 services:
+  next-app:
+    build: ./
+    container_name: next-auth-app
+    env_file:
+      - ./.env.local
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./:/app
+    depends_on:
+      - mongodb
   mongodb:
     image: mongo
     container_name: mongodb_app
