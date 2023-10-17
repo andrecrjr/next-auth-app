@@ -30,8 +30,7 @@ export function UserLoginForm({className, ...props}:UserAuthFormProps){
         setisLoading(true)
 
         const res = await signIn<"credentials">("credentials",{...data, redirect:false})
-    
- 
+
         setData({email:"", password:""})
         setisLoading(false)
     }
