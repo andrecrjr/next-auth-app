@@ -40,7 +40,7 @@ export function UserRegisterForm({className, ...props}:UserAuthFormProps){
         if(!request.ok){
             console.log("Error")
         }
-        console.log(`USER REGISTER FORM: ${JSON.stringify(response.message)}`)
+        console.log(`USER REGISTER: ${JSON.stringify(response.data)}`)
         setData({email:"", password:"", name:""})
         setisLoading(false)
     }

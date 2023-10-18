@@ -29,7 +29,7 @@ export async function POST(request:NextRequest):Promise<NextResponse>{
         hashedPassword
     }})
 
-    console.log(`USER CREATED ${user}`)
+    console.log(`USER CREATED ${JSON.stringify(user)}`)
 
     return NextResponse.json({data:user});
 
