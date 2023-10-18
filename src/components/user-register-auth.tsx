@@ -30,7 +30,17 @@ export function UserRegisterForm({className, ...props}:UserAuthFormProps){
     async function _onSubmit(e:React.FormEvent){
         e.preventDefault()
         setisLoading(true)
-
+        const request = await fetch("/api/users", {
+        method: "POST", 
+        headers:{
+            "Content-type":"aplication/json"
+        },
+        body: JSON.stringify(data)})
+        const response = await request.json();
+        if(!request.ok){
+            console.log("Error")
+        }
+        console.log(`USER REGISTER FORM: ${JSON.stringify(response.message)}`)
         setData({email:"", password:"", name:""})
         setisLoading(false)
     }
@@ -44,7 +54,7 @@ export function UserRegisterForm({className, ...props}:UserAuthFormProps){
     return (
         <section className={cn("grid gap-6", className)} {...props}>
             
-            <form onSubmit={_onSubmit}>
+            <form onSubmit={_onSubmit} method="POST">
                 <div className="grid gap-2">
                     <fieldset className="grid gap-1">
                         <Label className="sr-only" htmlFor="email">E-mail</Label>
@@ -81,7 +91,7 @@ export function UserRegisterForm({className, ...props}:UserAuthFormProps){
                             autoCapitalize="none"
                             disabled={isLoading}
                             name="name"
-                            value={data.email}
+                            value={data.name}
                             placeholder="Your Name"
                             onChange={handleChange}
                         />

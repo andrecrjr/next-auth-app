@@ -9,3 +9,6 @@ log-node:
 
 log-mongo:
 	docker logs -f mongodb_app
+
+shell:
+	docker exec -it next-auth-app bash

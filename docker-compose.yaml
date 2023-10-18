@@ -10,18 +10,22 @@ services:
     volumes:
       - ./:/app
     depends_on:
-      - mongodb
-  mongodb:
-    image: mongo
-    container_name: mongodb_app
-    restart: always
-    ports:
-      - 27017:27017
-    volumes:
-      - database:/data/db
+      - mongo
+
+  # Replica Set (required for Prisma Client)
+  mongo:
+    build: ./mongodb_replica
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=docker-app
-      - MONGO_INITDB_ROOT_PASSWORD=123
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: prisma
+      MONGO_REPLICA_HOST: mongo
+      MONGO_REPLICA_PORT: 27018
+    ports:
+      - '27018:27018'
+    restart: always # restart between reboots
+    healthcheck:
+      test: ['CMD', 'mongo', 'admin', '--port', '27018', '--eval', "db.adminCommand('ping')"]
+
 
 volumes:
   database:
@@ -30,3 +34,5 @@ volumes:
 networks:
   app-network:
     driver: bridge
+    ipam:
+      driver: default
