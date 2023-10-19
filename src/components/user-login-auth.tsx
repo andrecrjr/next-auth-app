@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "./ui/icons";
 import { signIn } from "next-auth/react";
 
+import { useToast } from "./ui/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
+import { Router } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement>{
 
 }
@@ -22,6 +27,9 @@ export function UserLoginForm({className, ...props}:UserAuthFormProps){
         password:""
     })
 
+    const { toast } = useToast()
+    const router = useRouter()
+
     const [isLoading, setisLoading] = useState(false);
     
 
@@ -29,10 +37,22 @@ export function UserLoginForm({className, ...props}:UserAuthFormProps){
         e.preventDefault()
         setisLoading(true)
 
-        const res = await signIn<"credentials">("credentials",{...data, redirect:false})
-
-        setData({email:"", password:""})
-        setisLoading(false)
+        const response = await signIn<"credentials">("credentials",{...data, redirect:false})
+        if(!response?.ok){
+             toast({
+                title:"Oops!",
+                description:response?.error,
+                variant:"destructive",
+                action:(
+                    <ToastAction altText="Tente denovo">Tente Novamente</ToastAction>
+                )
+            })
+            setData({email:"", password:""})
+            setisLoading(false)
+        }else{
+            router.push("/")
+        }
+        
     }
 
     const handleChange = async (e:React.ChangeEvent<HTMLInputElement>) =>{

@@ -6,6 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Icons } from "./ui/icons";
 import { signIn } from "next-auth/react";
+import { useToast } from "./ui/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
+import { useRouter } from "next/navigation";
+
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement>{
 
@@ -18,6 +22,7 @@ interface IUser{
 }
 
 export function UserRegisterForm({className, ...props}:UserAuthFormProps){
+    const { toast } = useToast()
     const [data, setData] = useState<IUser>({
         email:"",
         password:"",
@@ -25,6 +30,8 @@ export function UserRegisterForm({className, ...props}:UserAuthFormProps){
     })
 
     const [isLoading, setisLoading] = useState(false);
+    const router = useRouter()
+
     
 
     async function _onSubmit(e:React.FormEvent){
@@ -38,11 +45,21 @@ export function UserRegisterForm({className, ...props}:UserAuthFormProps){
         body: JSON.stringify(data)})
         const response = await request.json();
         if(!request.ok){
-            console.log("Error")
+            toast({
+                title:"Oops!",
+                description:response.error,
+                variant:"destructive",
+                action:(
+                    <ToastAction altText="Tente denovo">Tente Novamente</ToastAction>
+                )
+            })
+            setData({email:"", password:"", name:""})
+            setisLoading(false)
+            return;
         }
+    
         console.log(`USER REGISTER: ${JSON.stringify(response.data)}`)
-        setData({email:"", password:"", name:""})
-        setisLoading(false)
+        router.push("/login")
     }
 
     const handleChange = async (e:React.ChangeEvent<HTMLInputElement>) =>{
