@@ -1,16 +1,17 @@
 'use client'
 import { cn } from "@/lib/utils";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Icons } from "./ui/icons";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 import { useToast } from "./ui/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 import { Router } from "lucide-react";
 import { useRouter } from "next/navigation";
+import GithubLoginButton from "./GithubLoginButton";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement>{
 
@@ -27,9 +28,17 @@ export function UserLoginForm({className, ...props}:UserAuthFormProps){
         password:""
     })
 
+    
+
     const { toast } = useToast()
     const router = useRouter()
-
+    const session = useSession();
+    useEffect(()=>{
+        console.log("verificando login")
+        if(session?.status === "authenticated"){
+            router.push("/")
+        }
+    },[session?.status, router])
     const [isLoading, setisLoading] = useState(false);
     
 
@@ -49,10 +58,8 @@ export function UserLoginForm({className, ...props}:UserAuthFormProps){
             })
             setData({email:"", password:""})
             setisLoading(false)
-        }else{
-            router.push("/")
-        }
-        
+            return;
+        }        
     }
 
     const handleChange = async (e:React.ChangeEvent<HTMLInputElement>) =>{
@@ -98,6 +105,7 @@ export function UserLoginForm({className, ...props}:UserAuthFormProps){
                 </div>
                 
                 <Button type="submit" className="w-full mt-4">{isLoading && <Icons.spinner className="mr-2 h-4 animate-spin"/>} Entrar</Button>
+                <GithubLoginButton />
             </form>
 
         </section>

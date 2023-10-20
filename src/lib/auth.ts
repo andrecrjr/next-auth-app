@@ -11,7 +11,7 @@ export const authOptions:NextAuthOptions = {
     adapter:PrismaAdapter(db as any),
     providers:[GithubProvider({
         clientId: process.env.GITHUB_CLIENTID!,
-        clientSecret: process.env.GITHUB_SECRET!
+        clientSecret: process.env.GITHUB_SECRET!,
     }),
     Credentials({
         name:"credentials",
@@ -23,7 +23,6 @@ export const authOptions:NextAuthOptions = {
         async authorize(credentials, req):Promise<any> {
             // backend to authorize user using prisma DB
             
-            console.log(credentials)
             if(!credentials?.email || !credentials?.password) throw new Error("Login Data is needed")
 
             const user = await prisma.user.findUnique({
@@ -39,13 +38,14 @@ export const authOptions:NextAuthOptions = {
             const matchPassword = await bcrypt.compare(credentials.password, user.hashedPassword);
             if(!matchPassword) throw new Error("Wrong email or password")
 
-            return user;
+            return {email:user.email};
         },
     })],
     debug:process.env.NODE_ENV === 'development',
     secret: process.env.NEXTAUTH_SECRET,
     session: {
-        strategy:"jwt"
+        strategy:"jwt",
+        
     },
     pages:{
         signIn:"/login"

@@ -44,6 +44,7 @@ export function UserRegisterForm({className, ...props}:UserAuthFormProps){
         },
         body: JSON.stringify(data)})
         const response = await request.json();
+        console.log(response.ok)
         if(!request.ok){
             toast({
                 title:"Oops!",
@@ -55,10 +56,8 @@ export function UserRegisterForm({className, ...props}:UserAuthFormProps){
             })
             setData({email:"", password:"", name:""})
             setisLoading(false)
-            return;
         }
     
-        console.log(`USER REGISTER: ${JSON.stringify(response.data)}`)
         router.push("/login")
     }
 
