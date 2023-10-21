@@ -6,12 +6,32 @@ import GithubProvider from 'next-auth/providers/github';
 import { db } from './db';
 import { db as prisma } from './db';
 import bcrypt from 'bcrypt'
+import { GithubProfile } from '@/types/next-auth';
+import { unstable_createNodejsStream } from 'next/dist/compiled/@vercel/og';
 
 export const authOptions:NextAuthOptions = {
     adapter:PrismaAdapter(db as any),
     providers:[GithubProvider({
         clientId: process.env.GITHUB_CLIENTID!,
         clientSecret: process.env.GITHUB_SECRET!,
+        async profile(profile, tokens) {
+            // adicionando novos dados ao prisma
+            return {
+                id: profile.id,
+                name: profile.name,
+                email: profile.email,
+                image: profile.avatar_url,
+                login: profile.login,
+                location: profile.location,
+                url: profile.url,
+                bio:           profile.bio,
+                twitter_username:  profile.twitter_username,
+                public_repos:   profile.public_repos,
+                public_gists:   profile.public_gists,
+                followers :    profile.followers,
+                following:    profile.following,
+            }
+        },
     }),
     Credentials({
         name:"credentials",
@@ -45,7 +65,21 @@ export const authOptions:NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     session: {
         strategy:"jwt",
-        
+    },
+    callbacks:{
+        jwt: async ({ token, user }) => {
+            user && (token.user=user)
+            return token;
+         },
+        async session({session, token}) {
+            const userData = token.user;
+            if(userData && typeof userData === 'object' && 'login' in userData 
+            && 'location' in userData && 'email' in userData){
+                session.user = userData as GithubProfile
+            }
+            
+            return session;
+        },
     },
     pages:{
         signIn:"/login"
