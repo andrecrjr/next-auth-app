@@ -1,5 +1,5 @@
 
-import { PrismaAdapter } from '@auth/prisma-adapter';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
@@ -8,6 +8,7 @@ import { db as prisma } from './db';
 import bcrypt from 'bcrypt'
 import { GithubProfile } from '@/types/next-auth';
 import { unstable_createNodejsStream } from 'next/dist/compiled/@vercel/og';
+import { Adapter } from 'next-auth/adapters';
 
 export const authOptions:NextAuthOptions = {
     adapter:PrismaAdapter(db as any),
@@ -40,7 +41,7 @@ export const authOptions:NextAuthOptions = {
             password: {label:"Password", type:"password"},
             username: {label:"Name", type:"text", placeholder: "Eroshin"}
         },
-        async authorize(credentials, req):Promise<any> {
+        async authorize(credentials, req) {
             // backend to authorize user using prisma DB
             
             if(!credentials?.email || !credentials?.password) throw new Error("Login Data is needed")
@@ -57,8 +58,8 @@ export const authOptions:NextAuthOptions = {
 
             const matchPassword = await bcrypt.compare(credentials.password, user.hashedPassword);
             if(!matchPassword) throw new Error("Wrong email or password")
-
-            return {email:user.email};
+            
+            return {id:user.email||"", email:user.email};
         },
     })],
     debug:process.env.NODE_ENV === 'development',
