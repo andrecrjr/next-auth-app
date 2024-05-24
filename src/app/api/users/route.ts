@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(request:NextRequest):Promise<NextResponse>{
     const data = await request.json()
-    const {name, email, password} = data;
+    const {name, email, password}:{name:string, email:string, password:string} = data;
 
     if(!name || !email || !password){
         return NextResponse.json({"error":"Dados invalidos"}, {status:400})
@@ -21,13 +21,15 @@ export async function POST(request:NextRequest):Promise<NextResponse>{
         return NextResponse.json({"erro":"Email já existente"}, { status:400 })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword:string = await bcrypt.hash(password, 10)
 
-    const user = await prisma.user.create({data:{
-        email,
-        name,
-        hashedPassword
-    }})
+    const user = await prisma.user.create({
+        data:{
+            email,
+            name,
+            hashedPassword
+        }
+})
 
     console.log(`USER CREATED ${JSON.stringify(user)}`)
 

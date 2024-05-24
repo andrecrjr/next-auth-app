@@ -43,22 +43,22 @@ model Session {
 
 model User {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  name           String?
-  email          String?   @unique
+  name           String
+  email          String   @unique
   url            String?
   emailVerified  DateTime?
   hashedPassword String?
   image          String?
-  login          String
+  login          String?
   location       String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   bio           String?
   twitter_username  String?
-  public_repos    Int
-  public_gists    Int
-  followers     Int
-  following     Int
+  public_repos    Int?
+  public_gists    Int?
+  followers     Int?
+  following     Int?
   accounts       Account[]
    sessions      Session[]
 }
